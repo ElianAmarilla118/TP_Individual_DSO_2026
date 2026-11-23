@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 
 export default function PerfilSelectorScreen() {
-  const { actores, actorActivo, seleccionarComprador, seleccionarOrganizador } = useAuth();
+  const {
+    actores,
+    actorActivo,
+    seleccionarComprador,
+    seleccionarOrganizador,
+    recargarActores,
+  } = useAuth();
+
+  useFocusEffect(
+    useCallback(() => {
+      recargarActores();
+    }, [])
+  );
 
   return (
     <ScrollView style={styles.container}>

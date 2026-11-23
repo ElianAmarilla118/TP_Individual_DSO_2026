@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
 import ExplorarScreen from '../screens/comprador/ExplorarScreen';
@@ -63,7 +64,27 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Tab.Navigator screenOptions={{ tabBarActiveTintColor: '#16A34A' }}>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarActiveTintColor: '#16A34A',
+          tabBarInactiveTintColor: '#6B7280',
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName = 'ellipse-outline';
+
+            if (route.name === 'ExplorarTab') {
+              iconName = focused ? 'search' : 'search-outline';
+            } else if (route.name === 'MisComprasTab') {
+              iconName = focused ? 'ticket' : 'ticket-outline';
+            } else if (route.name === 'GestionTab') {
+              iconName = focused ? 'calendar' : 'calendar-outline';
+            } else if (route.name === 'PerfilTab') {
+              iconName = focused ? 'person-circle' : 'person-circle-outline';
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
+      >
         {!esOrganizador ? (
           <>
             <Tab.Screen name="ExplorarTab" component={ExplorarStack} options={{ headerShown: false, title: 'Explorar' }} />

@@ -1,0 +1,142 @@
+classDiagram
+    direction TB
+
+    class EstadoCompra {
+        <<enumeration>>
+        PENDIENTE
+        CONFIRMADA
+        UTILIZADA
+        CANCELADA
+        REEMBOLSADA
+    }
+
+    class TipoActor {
+        <<enumeration>>
+        COMPRADOR
+        ORGANIZADOR
+    }
+
+    class ActorRef {
+        -String id
+        -TipoActor tipo
+        -String nombre
+    }
+
+    class Comprador {
+        -String id
+        -String nombre
+        -String apellido
+        -String email
+        -Evento[] favoritos
+        +nombreCompleto() String
+        +toggleFavorito(Evento) Boolean
+        +esFavorito(String) Boolean
+        +comoActor() ActorRef
+    }
+
+    class Organizador {
+        -String id
+        -String nombreComercial
+        -String descripcion
+        -String email
+        +obtenerReseniasHistoricas(Resenia[]) Resenia[]
+        +calcularPuntajePromedio(Resenia[]) Number
+        +comoActor() ActorRef
+    }
+
+    class Categoria {
+        -String id
+        -String nombre
+        -String descripcion
+    }
+
+    class Evento {
+        -String id
+        -String nombre
+        -String descripcion
+        -Categoria categoria
+        -Date fecha
+        -TipoEntrada[] tiposEntrada
+        -String[] multimedia
+        -Organizador organizador
+        +tuPrecioEstaEntre(Number, Number) Boolean
+        +obtenerPrecioMinimo() Number
+        +yaSeRealizo(Date) Boolean
+        +obtenerTipoEntradaPorId(String) TipoEntrada
+    }
+
+    class TipoEntrada {
+        -String id
+        -String nombre
+        -String descripcion
+        -Number precio
+        -Number cupoTotal
+        -Number cupoDisponible
+        +hayCupoPara(Number) Boolean
+        +descontarCupo(Number) void
+        +reponerCupo(Number) void
+    }
+
+    class Compra {
+        -String id
+        -Comprador comprador
+        -Evento evento
+        -TipoEntrada tipoEntrada
+        -Number cantidad
+        -Number total
+        -EstadoCompra estado
+        -Mensaje[] mensajes
+        -CambioEstadoCompra[] historialEstados
+        +actualizarEstado(EstadoCompra, ActorRef) void
+        +diasRestantesParaEvento(Date) Number
+        +puedeCancelarse(Date) Boolean
+        +cancelarYReembolsar(ActorRef, Date) void
+        +agregarMensaje(ActorRef, String) Mensaje
+        +puedeSerReseniada() Boolean
+    }
+
+    class CambioEstadoCompra {
+        -String id
+        -String compraId
+        -EstadoCompra estado
+        -ActorRef quien
+        -Date fechaHora
+    }
+
+    class Mensaje {
+        -String id
+        -ActorRef autor
+        -String mensaje
+        -Date enviado
+    }
+
+    class Resenia {
+        -String id
+        -Comprador comprador
+        -Evento evento
+        -String compraId
+        -String detalle
+        -Number puntuacion
+        -Date fecha
+    }
+
+    %% Relaciones principales
+    Comprador "1" --> "*" Evento : favoritos
+    Organizador "1" <-- "*" Evento : organizador
+    Evento "*" --> "1" Categoria : categoria
+    Evento "1" *-- "1..*" TipoEntrada : tiposEntrada
+
+    Compra "*" --> "1" Comprador : comprador
+    Compra "*" --> "1" Evento : evento
+    Compra "*" --> "1" TipoEntrada : tipoEntrada
+    Compra --> "1" EstadoCompra : estado
+    Compra "1" *-- "*" Mensaje : mensajes
+    Compra "1" *-- "1..*" CambioEstadoCompra : historialEstados
+
+    CambioEstadoCompra --> "1" EstadoCompra : estado
+    CambioEstadoCompra --> "1" ActorRef : quien
+    Mensaje --> "1" ActorRef : autor
+    ActorRef --> "1" TipoActor : tipo
+
+    Resenia "*" --> "1" Comprador : comprador
+    Resenia "*" --> "1" Evento : evento
